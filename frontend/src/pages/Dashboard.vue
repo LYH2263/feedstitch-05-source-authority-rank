@@ -21,7 +21,9 @@ onMounted(async () => {
     <div class="tiles" v-if="stats">
       <div class="tile"><div class="hero-num">{{ stats.source_count }}</div><div class="muted">源</div></div>
       <div class="tile"><div class="hero-num">{{ stats.canonical_count }}</div><div class="muted">Canonical</div></div>
-      <div class="tile"><div class="hero-num">{{ stats.conflict_count }}</div><div class="muted">冲突</div></div>
+      <div class="tile"><div class="hero-num">{{ stats.conflict_count }}</div><div class="muted">冲突 / 隔离</div></div>
+      <div class="tile"><div class="hero-num">{{ stats.authority_isolated_count }}</div><div class="muted">权威落败隔离</div></div>
+      <div class="tile"><div class="hero-num">{{ stats.authority_change_count }}</div><div class="muted">权威覆盖变更</div></div>
       <div class="tile"><div class="hero-num">{{ stats.run_count }}</div><div class="muted">Runs</div></div>
       <div class="tile"><div class="hero-num">{{ stats.staging_count }}</div><div class="muted">Staging</div></div>
       <div class="tile"><div class="hero-num">{{ stats.enabled_sources }}</div><div class="muted">启用源</div></div>

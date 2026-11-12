@@ -5,13 +5,18 @@ import sqlite3
 from typing import Any
 
 
+_SELECT = """
+    SELECT c.id, c.business_key, c.title, c.price, c.category, c.source_id,
+           s.name AS source_name, s.authority_rank AS source_authority_rank,
+           c.event_ts, c.source_revision, c.payload_json, c.updated_at
+    FROM canonical_items c
+    LEFT JOIN sources s ON s.id = c.source_id
+"""
+
+
 def list_items(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     rows = conn.execute(
-        """
-        SELECT id, business_key, title, price, category, source_id,
-               event_ts, source_revision, payload_json, updated_at
-        FROM canonical_items ORDER BY business_key
-        """
+        _SELECT + " ORDER BY c.business_key"
     ).fetchall()
     out = []
     for r in rows:
@@ -23,11 +28,7 @@ def list_items(conn: sqlite3.Connection) -> list[dict[str, Any]]:
 
 def get_by_key(conn: sqlite3.Connection, business_key: str) -> dict[str, Any] | None:
     row = conn.execute(
-        """
-        SELECT id, business_key, title, price, category, source_id,
-               event_ts, source_revision, payload_json, updated_at
-        FROM canonical_items WHERE business_key = ?
-        """,
+        _SELECT + " WHERE c.business_key = ?",
         (business_key,),
     ).fetchone()
     if not row:

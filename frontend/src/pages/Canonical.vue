@@ -22,14 +22,17 @@ onMounted(load)
 <template>
   <div class="page">
     <h1>Canonical</h1>
-    <p class="muted">归并后的权威货号表。列表条数应与最近 Run 报告中的 canonical_count 对得上。</p>
+    <p class="muted">
+      归并后的权威货号表；“归属源”即当前写入主数据的源。列表条数应与最近 Run 报告中的
+      canonical_count 对得上。
+    </p>
     <p v-if="err" class="tag danger">{{ err }}</p>
     <div class="panel">
       <p>共 <strong>{{ rows.length }}</strong> 条</p>
       <table>
         <thead>
           <tr>
-            <th>key</th><th>title</th><th>price</th><th>category</th><th>source</th><th>rev</th><th>event_ts</th><th></th>
+            <th>key</th><th>title</th><th>price</th><th>category</th><th>归属源</th><th>源权威序</th><th>rev</th><th>event_ts</th><th></th>
           </tr>
         </thead>
         <tbody>
@@ -38,7 +41,8 @@ onMounted(load)
             <td>{{ r.title }}</td>
             <td class="mono">{{ r.price }}</td>
             <td>{{ r.category }}</td>
-            <td>{{ r.source_id }}</td>
+            <td>{{ r.source_name }} <span class="muted">(#{{ r.source_id }})</span></td>
+            <td>{{ r.source_authority_rank }}</td>
             <td>{{ r.source_revision }}</td>
             <td class="mono">{{ r.event_ts }}</td>
             <td><button class="secondary" @click="openDetail(r.business_key)">详情</button></td>

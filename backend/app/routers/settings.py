@@ -39,6 +39,7 @@ def list_watermarks():
                 "name": s["name"],
                 "watermark_ts": s["watermark_ts"],
                 "lookback_seconds": s["lookback_seconds"],
+                "authority_rank": s["authority_rank"],
             }
             for s in sources_repo.list_sources(conn)
         ]

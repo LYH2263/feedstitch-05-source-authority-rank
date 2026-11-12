@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.db import connect
 from app.repositories import sources as sources_repo
-from app.schemas.entities import LookbackUpdate
+from app.schemas.entities import AuthorityUpdate, LookbackUpdate
 from app.services.ingest_service import preview_source
 
 router = APIRouter(tags=["sources"])
@@ -47,6 +47,20 @@ def patch_lookback(source_id: int, body: LookbackUpdate):
         if not sources_repo.get_source(conn, source_id):
             raise HTTPException(404, "source not found")
         sources_repo.update_lookback(conn, source_id, body.lookback_seconds)
+        conn.commit()
+        return sources_repo.get_source(conn, source_id)
+    finally:
+        conn.close()
+
+
+@router.patch("/sources/{source_id}/authority")
+def patch_authority(source_id: int, body: AuthorityUpdate):
+    """Set the source's cross-source authority rank (larger = more authoritative)."""
+    conn = connect()
+    try:
+        if not sources_repo.get_source(conn, source_id):
+            raise HTTPException(404, "source not found")
+        sources_repo.update_authority(conn, source_id, body.authority_rank)
         conn.commit()
         return sources_repo.get_source(conn, source_id)
     finally:

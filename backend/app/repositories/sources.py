@@ -7,8 +7,9 @@ from typing import Any
 def list_sources(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     rows = conn.execute(
         """
-        SELECT id, name, format, fixture_path, watermark_ts, lookback_seconds, enabled, note
-        FROM sources ORDER BY id
+        SELECT id, name, format, fixture_path, watermark_ts, lookback_seconds,
+               enabled, authority_rank, note
+        FROM sources ORDER BY authority_rank DESC, id
         """
     ).fetchall()
     return [dict(r) for r in rows]
@@ -17,7 +18,8 @@ def list_sources(conn: sqlite3.Connection) -> list[dict[str, Any]]:
 def get_source(conn: sqlite3.Connection, source_id: int) -> dict[str, Any] | None:
     row = conn.execute(
         """
-        SELECT id, name, format, fixture_path, watermark_ts, lookback_seconds, enabled, note
+        SELECT id, name, format, fixture_path, watermark_ts, lookback_seconds,
+               enabled, authority_rank, note
         FROM sources WHERE id = ?
         """,
         (source_id,),
@@ -33,4 +35,11 @@ def update_lookback(conn: sqlite3.Connection, source_id: int, lookback_seconds: 
     conn.execute(
         "UPDATE sources SET lookback_seconds = ? WHERE id = ?",
         (lookback_seconds, source_id),
+    )
+
+
+def update_authority(conn: sqlite3.Connection, source_id: int, authority_rank: int) -> None:
+    conn.execute(
+        "UPDATE sources SET authority_rank = ? WHERE id = ?",
+        (authority_rank, source_id),
     )

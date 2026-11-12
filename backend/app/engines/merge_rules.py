@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.modules.source_authority_rank import decide_divergence
+
 
 NON_KEY_FIELDS = ("title", "price", "category")
 
@@ -19,19 +21,26 @@ def fields_conflict(existing: dict[str, Any], incoming: dict[str, Any]) -> bool:
 def decide_merge(
     existing: dict[str, Any] | None,
     incoming: dict[str, Any],
+    *,
+    incoming_authority: int | None = None,
+    owner_authority: int | None = None,
 ) -> str:
-    """Return one of: insert | upsert | conflict | skip_stale.
+    """Return one of:
+
+    ``insert`` | ``upsert`` | ``skip_stale`` |
+    ``authority_override`` | ``authority_lost`` | ``conflict``
 
     Base rules (lookback not implemented):
     - no existing → insert
-    - non-key diverge → conflict
+    - non-key diverge → authority decision (conflict when ranks are equal
+      or unknown; without rank arguments this stays a plain conflict)
     - same non-key, incoming revision > existing → upsert
     - else → skip_stale
     """
     if existing is None:
         return "insert"
     if fields_conflict(existing, incoming):
-        return "conflict"
+        return decide_divergence(incoming_authority, owner_authority)
     if int(incoming["source_revision"]) > int(existing["source_revision"]):
         return "upsert"
     return "skip_stale"
